@@ -4,9 +4,9 @@
 
 package plt
 
-// C returns a color from a default palette
+// GetColor returns a color from a default palette
 //  use palette < 0 for automatic color
-func C(i, palette int) string {
+func GetColor(i, palette int) string {
 	if palette < 0 || palette >= len(palettes) {
 		return ""
 	}
@@ -14,9 +14,9 @@ func C(i, palette int) string {
 	return p[i%len(p)]
 }
 
-// M returns a marker
+// GetMarker returns a marker
 //  use scheme < 0 for no marker
-func M(i, scheme int) string {
+func GetMarker(i, scheme int) string {
 	if scheme < 0 {
 		return ""
 	}

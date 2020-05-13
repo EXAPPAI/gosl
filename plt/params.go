@@ -4,68 +4,84 @@
 
 package plt
 
-import (
-	"bytes"
+// ParamsControl holds parameters to setup plots
+type ParamsControl struct {
+	UsePython bool    // use Python instead of JS-server
+	TmpDir    string  // temporary dir for gosl.py file. default = "/tmp/gosl/plt"
+	OutDir    string  // output directory for figures. default = "/tmp/gosl/plt"
+	FigEps    bool    // figure: save EPS file instead of PNG
+	FigDpi    int     // figure: dpi to be used when saving figure
+	FigProp   float64 // figure: proportion: height = width * prop
+	FigWidth  float64 // figure: width. Example: get this from LaTeX using \showthe\columnwidth
+}
 
-	"github.com/cpmech/gosl/io"
-)
-
-// The A structure holds arguments to configure plots, including style data for shapes (e.g. polygons)
-type A struct {
-
-	// plot and basic options
-	C      string  // color
-	A      float64 // transparency coefficient
-	M      string  // marker
-	Ls     string  // linestyle
-	Lw     float64 // linewidth; -1 => default
-	Ms     int     // marker size; -1 => default
-	L      string  // label
-	Me     int     // mark-every; -1 => default
-	Z      int     // z-order
-	Mec    string  // marker edge color
-	Mew    float64 // marker edge width
-	Void   bool    // void marker => markeredgecolor='C', markerfacecolor='none'
-	NoClip bool    // turn clipping off
+// ParamsPlot holds parameters to style lines, shapes (e.g. polygons) and text
+type ParamsPlot struct {
+	// lines
+	Color           string  // color
+	Alpha           float64 // transparency coefficient
+	Marker          string  // marker
+	LineStyle       string  // linestyle
+	LineWidth       float64 // linewidth; -1 => default
+	MarkerSize      int     // marker size; -1 => default
+	Label           string  // label
+	MarkEvery       int     // mark-every; -1 => default
+	Zindex          int     // z-order
+	MarkerEdgeColor string  // marker edge color
+	MarkerEdgeWidth float64 // marker edge width
+	MarkerVoid      bool    // void marker => markeredgecolor='C', markerfacecolor='none'
+	NoClip          bool    // turn clipping off
 
 	// shapes
-	Fc     string  // shapes: face color
-	Ec     string  // shapes: edge color
-	Scale  float64 // shapes: scale information
-	Style  string  // shapes: style information
-	Closed bool    // shapes: closed shape
+	ShapeFaceColor string  // shapes: face color
+	ShapeEdgeColor string  // shapes: edge color
+	ShapeScale     float64 // shapes: scale information
+	ShapeStyle     string  // shapes: style information
+	ShapeClosed    bool    // shapes: closed shape
+}
 
-	// text and extra arguments
-	Ha      string  // horizontal alignment; e.g. 'center'
-	Va      string  // vertical alignment; e.g. 'center'
-	Rot     float64 // rotation
-	Fsz     float64 // font size
-	FszLbl  float64 // font size of labels
-	FszLeg  float64 // font size of legend
-	FszXtck float64 // font size of x-ticks
-	FszYtck float64 // font size of y-ticks
-	FontSet string  // font set: e.g. 'stix', 'stixsans' [default]
-	HideL   bool    // hide left frame border
-	HideR   bool    // hide right frame border
-	HideB   bool    // hide bottom frame border
-	HideT   bool    // hide top frame border
+// ParamsText holds parameters to style text and fontsizes
+type ParamsText struct {
+	// text
+	AlignHoriz string  // horizontal alignment; e.g. 'center'
+	AlignVert  string  // vertical alignment; e.g. 'center'
+	Rotation   float64 // rotation
+
+	// fontsizes
+	Size     float64 // font size
+	SizeLbl  float64 // font size of labels
+	SizeLeg  float64 // font size of legend
+	SizeXtck float64 // font size of x-ticks
+	SizeYtck float64 // font size of y-ticks
+	FontSet  string  // font set: e.g. 'stix', 'stixsans' [default]
+}
+
+// ParamsFrame holds parameters to style the figure area
+type ParamsFrame struct {
+	// frame
+	HideLeft   bool // hide left frame border
+	HideRight  bool // hide right frame border
+	HideBottom bool // hide bottom frame border
+	HideTop    bool // hide top frame border
 
 	// other options
-	AxCoords  bool // the given x-y coordinates correspond to axes coords
-	FigCoords bool // the given x-y coordinates correspond to figure coords
+	UseAxCoords  bool // the given x-y coordinates correspond to axes coords
+	UseFigCoords bool // the given x-y coordinates correspond to figure coords
+}
 
-	// legend
-	LegLoc   string    // legend: location. e.g.: right, center left, upper right, lower right, best, center, lower left, center right, upper left, upper center, lower center
-	LegNcol  int       // legend: number of columns
-	LegHlen  float64   // legend: handle length
-	LegFrame bool      // legend: frame on
-	LegOut   bool      // legend: outside
-	LegOutX  []float64 // legend: normalised coordinates to put legend outside frame
+// ParamsLeg holds parameters to style the legend
+type ParamsLeg struct {
+	Loc   string    // legend: location. e.g.: right, center left, upper right, lower right, best, center, lower left, center right, upper left, upper center, lower center
+	Ncol  int       // legend: number of columns
+	Hlen  float64   // legend: handle length
+	Frame bool      // legend: frame on
+	Out   bool      // legend: outside
+	OutX  []float64 // legend: normalised coordinates to put legend outside frame
+}
 
-	// colors for contours or histograms
-	Colors []string // contour or histogram: colors
-
-	// contours
+// ParamsContour holds parameters for contours
+type ParamsContour struct {
+	Colors   []string  // contour: colors
 	Nlevels  int       // contour: number of levels (overridden by Levels when it's not nil)
 	Levels   []float64 // contour: levels (may be nil)
 	CmapIdx  int       // contour: colormap index
@@ -78,35 +94,39 @@ type A struct {
 	SelectV  float64   // contour: selected value
 	SelectC  string    // contour: color to mark selected level. empty means no selected line
 	SelectLw float64   // contour: zero level linewidth
+}
 
-	// 3d graphs
+// Params3d holds parameters for 3D plots
+type Params3d struct {
 	Rstride int  // 3d: row stride
 	Cstride int  // 3d: column stride
 	Surf    bool // 3d: generate surface
 	Wire    bool // 3d: generate wireframe
-
-	// histograms
-	Type    string // histogram: type; e.g. "bar"
-	Stacked bool   // histogram: stacked
-	NoFill  bool   // histogram: do not fill bars
-	Nbins   int    // histogram: number of bins
-	Normed  bool   // histogram: normed
-
-	// figures
-	Dpi     int     // figure: dpi to be used when saving figure. default = 96
-	Png     bool    // figure: save png file
-	Eps     bool    // figure: save eps file
-	Prop    float64 // figure: proportion: height = width * prop
-	WidthPt float64 // figure: width in points. Get this from LaTeX using \showthe\columnwidth
 }
 
-// String returns a string representation of arguments
-func (o A) String(forHistogram, for3dPoints bool) (l string) {
+// ParamsHist holds parameters for histograms
+type ParamsHist struct {
+	Colors  []string // histogram: colors
+	Type    string   // histogram: type; e.g. "bar"
+	Stacked bool     // histogram: stacked
+	NoFill  bool     // histogram: do not fill bars
+	Nbins   int      // histogram: number of bins
+	Normed  bool     // histogram: normed
+}
 
-	// fix color if Void==true
-	if o.Void && o.C == "" {
-		o.C = "red"
+func (o ParamsPlot) String() (l string) {
+	if paramsControl.UsePython {
+		return pythonParamsPlot(&o)
 	}
+	return l
+}
+
+/*
+// String returns a string representation of parameters
+func (o Params) String(forHistogram, for3dPoints bool) (l string) {
+
+
+	pythonAddToCmd(&l, o.AxCoords, "transform=plt.gca().transAxes")
 
 	// plot and basic options
 	if for3dPoints {
@@ -119,28 +139,8 @@ func (o A) String(forHistogram, for3dPoints bool) (l string) {
 		}
 		addToCmd(&l, o.Void && o.Mec == "", io.Sf("edgecolor='%s'", o.C))
 	} else {
-		addToCmd(&l, o.C != "", io.Sf("color='%s'", o.C))
-		addToCmd(&l, o.Ms > 0, io.Sf("ms=%d", o.Ms))
-		addToCmd(&l, o.Mec != "", io.Sf("markeredgecolor='%s'", o.Mec))
-		addToCmd(&l, o.Void, "markerfacecolor='none'")
-		addToCmd(&l, o.Void && o.Mec == "", io.Sf("markeredgecolor='%s'", o.C))
-		addToCmd(&l, o.Mew > 0, io.Sf("mew=%g", o.Mew))
-	}
-	addToCmd(&l, o.A > 0, io.Sf("alpha=%g", o.A))
-	addToCmd(&l, o.M != "", io.Sf("marker='%s'", o.M))
-	addToCmd(&l, o.Ls != "", io.Sf("linestyle='%s'", o.Ls))
-	addToCmd(&l, o.Lw > 0, io.Sf("lw=%g", o.Lw))
-	addToCmd(&l, o.L != "", io.Sf("label='%s'", o.L))
-	addToCmd(&l, o.Me > 0, io.Sf("markevery=%d", o.Me))
-	addToCmd(&l, o.Z > 0, io.Sf("zorder=%d", o.Z))
-	addToCmd(&l, o.NoClip, "clip_on=0")
-	addToCmd(&l, o.AxCoords, "transform=plt.gca().transAxes")
 
-	// shapes
-	addToCmd(&l, o.Fc != "", io.Sf("facecolor='%s'", o.Fc))
-	addToCmd(&l, o.Ec != "", io.Sf("edgecolor='%s'", o.Ec))
-
-	// text and extra arguments
+	// text and extra parameters
 	addToCmd(&l, o.Ha != "", io.Sf("ha='%s'", o.Ha))
 	addToCmd(&l, o.Va != "", io.Sf("va='%s'", o.Va))
 	addToCmd(&l, o.Rot > 0, io.Sf("rotation=%g", o.Rot))
@@ -158,49 +158,7 @@ func (o A) String(forHistogram, for3dPoints bool) (l string) {
 	return
 }
 
-// addToCmd adds new option to list of commands separated with commas
-func addToCmd(line *string, condition bool, delta string) {
-	if condition {
-		if len(*line) > 0 {
-			*line += ","
-		}
-		*line += delta
-	}
-}
 
-// updateBufferFirstArgsAndClose updates buffer with the first arguments and close with ")\n"
-func updateBufferFirstArgsAndClose(buf *bytes.Buffer, args *A, forHistogram, for3dPoints bool) {
-	if buf == nil {
-		return
-	}
-	if args == nil {
-		io.Ff(buf, ")\n")
-		return
-	}
-	txt := args.String(forHistogram, for3dPoints)
-	if txt == "" {
-		io.Ff(buf, ")\n")
-		return
-	}
-	io.Ff(buf, txt+")\n")
-}
-
-// updateBufferWithArgsAndClose updates buffer with arguments and close with ")\n".
-func updateBufferAndClose(buf *bytes.Buffer, args *A, forHistogram, for3dPoints bool) {
-	if buf == nil {
-		return
-	}
-	if args == nil {
-		io.Ff(buf, ")\n")
-		return
-	}
-	txt := args.String(forHistogram, for3dPoints)
-	if txt == "" {
-		io.Ff(buf, ")\n")
-		return
-	}
-	io.Ff(buf, ", "+txt+")\n")
-}
 
 // floats2list converts slice of floats to string representing a Python list
 func floats2list(vals []float64) (l string) {
@@ -228,24 +186,9 @@ func strings2list(vals []string) (l string) {
 	return
 }
 
-// getHideList returns a string representing the "spines-to-remove" list in Python
-func getHideList(args *A) (l string) {
-	if args == nil {
-		return
-	}
-	if args.HideL || args.HideR || args.HideB || args.HideT {
-		c := ""
-		addToCmd(&c, args.HideL, "'left'")
-		addToCmd(&c, args.HideR, "'right'")
-		addToCmd(&c, args.HideB, "'bottom'")
-		addToCmd(&c, args.HideT, "'top'")
-		l = "[" + c + "]"
-	}
-	return
-}
 
-// argsLeg returns legend arguments
-func argsLeg(args *A) (loc string, ncol int, hlen, fsz float64, frame int, out int, outX string) {
+// argsLeg returns legend parameters
+func argsLeg(args *Params) (loc string, ncol int, hlen, fsz float64, frame int, out int, outX string) {
 	loc = "'best'"
 	ncol = 1
 	hlen = 3.0
@@ -332,7 +275,7 @@ func argsFigData(args *A) (figType string, dpi, width, height int) {
 	return
 }
 
-// argsWireSurf collects arguments for Wireframe or Surface
+// argsWireSurf collects parameters for Wireframe or Surface
 func argsWireSurf(args *A, surf bool) (l string) {
 	if args != nil {
 		if surf {
@@ -356,7 +299,7 @@ func argsWireSurf(args *A, surf bool) (l string) {
 	return
 }
 
-// argsContour allocates args if nil, sets default parameters, and return formatted arguments
+// argsContour allocates args if nil, sets default parameters, and return formatted parameters
 func argsContour(in *A, Z [][]float64) (out *A, colors, levels string) {
 	out = in
 	if out == nil {
@@ -424,10 +367,4 @@ func getContourLevels(nlevels int, Z [][]float64) (l string) {
 	return
 }
 
-// pyBool converts Go bool to Python bool
-func pyBool(flag bool) int {
-	if flag {
-		return 1
-	}
-	return 0
-}
+*/

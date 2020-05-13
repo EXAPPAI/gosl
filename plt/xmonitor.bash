@@ -14,8 +14,8 @@ while true; do
     echo
     echo
     echo
-    #go test -test.run="Waterfall01"
-    #go test -test.run="draw03"
-    #go test -test.run="plot14"
-    go test -test.run="DrawArrow3d"
+    # go test -test.run="InitDefault"
+    # go test -test.run="InitWithParams"
+    # go test -test.run="HideBorders"
+    go test -test.run="PlotSimpleCurve"
 done
