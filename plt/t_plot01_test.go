@@ -14,7 +14,7 @@ import (
 
 func Test_args01(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("args01. arguments")
 
 	var a A
@@ -49,7 +49,7 @@ func Test_args01(tst *testing.T) {
 
 func Test_args02(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("args02. more arguments")
 
 	a := &A{
@@ -67,7 +67,7 @@ func Test_args02(tst *testing.T) {
 
 func Test_nlevels01(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("nlevels01. contour levels")
 
 	nlevels := 3
@@ -82,7 +82,7 @@ func Test_nlevels01(tst *testing.T) {
 
 func Test_plot01(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot01. Basic")
 
 	if chk.Verbose {
@@ -137,13 +137,13 @@ func Test_plot01(tst *testing.T) {
 			HideR:   true,
 		})
 
-		Save("/tmp/gosl/plt", "t_plot01")
+		PythonSave("/tmp/gosl/plt", "t_plot01")
 	}
 }
 
 func Test_plot02(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot02. More Basic")
 
 	if chk.Verbose {
@@ -177,13 +177,13 @@ func Test_plot02(tst *testing.T) {
 		AxisRange(-0.2, 1.3, -0.2, 1.3)
 		PlotOne(0, 0, &A{M: "*"})
 
-		Save("/tmp/gosl/plt", "t_plot02")
+		PythonSave("/tmp/gosl/plt", "t_plot02")
 	}
 }
 
 func Test_plot03(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot03. Contour")
 
 	if chk.Verbose {
@@ -213,13 +213,13 @@ func Test_plot03(tst *testing.T) {
 		ContourF(X, Y, F, a)
 		SetLabels("$x$", "$y$", nil)
 
-		Save("/tmp/gosl/plt", "t_plot03")
+		PythonSave("/tmp/gosl/plt", "t_plot03")
 	}
 }
 
 func Test_plot04(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot04. Contour and Quiver")
 
 	if chk.Verbose {
@@ -263,13 +263,13 @@ func Test_plot04(tst *testing.T) {
 		Quiver(X, Y, U, V, nil)
 		Grid(&A{C: "white"})
 
-		Save("/tmp/gosl/plt", "t_plot04")
+		PythonSave("/tmp/gosl/plt", "t_plot04")
 	}
 }
 
 func Test_plot05(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot05. Hist")
 
 	if chk.Verbose {
@@ -298,13 +298,13 @@ func Test_plot05(tst *testing.T) {
 		Hist(X, L, a)
 		Gll("series", "count", nil)
 
-		Save("/tmp/gosl/plt", "t_plot05")
+		PythonSave("/tmp/gosl/plt", "t_plot05")
 	}
 }
 
 func Test_plot06(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot06. Plot3dLine, Plot3dPoints, Surface and Wireframe")
 
 	if chk.Verbose {
@@ -338,13 +338,13 @@ func Test_plot06(tst *testing.T) {
 		AxDist(10.5)
 		Scale3d(0, 1.5, 0, 1.5, 0, 1.5, true)
 
-		Save("/tmp/gosl/plt", "t_plot06")
+		PythonSave("/tmp/gosl/plt", "t_plot06")
 	}
 }
 
 func Test_plot07(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot07. Triad, PlaneZ and Default3dView")
 
 	if chk.Verbose {
@@ -367,13 +367,13 @@ func Test_plot07(tst *testing.T) {
 		Default3dView(-0.1, 1.1, -0.1, 1.1, -0.1, 1.1, true)
 
 		// save
-		Save("/tmp/gosl/plt", "t_plot07")
+		PythonSave("/tmp/gosl/plt", "t_plot07")
 	}
 }
 
 func Test_plot08(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot08. Hemisphere")
 
 	if chk.Verbose {
@@ -405,13 +405,13 @@ func Test_plot08(tst *testing.T) {
 		SetLabels3d(`$x_{axis}$`, `$y_{axis}$`, `$z_{axis}$`, &A{C: "r", Fsz: 14})
 
 		// save
-		Save("/tmp/gosl/plt", "t_plot08")
+		PythonSave("/tmp/gosl/plt", "t_plot08")
 	}
 }
 
 func Test_plot09(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot09. Superquadric")
 
 	if chk.Verbose {
@@ -456,13 +456,13 @@ func Test_plot09(tst *testing.T) {
 		Default3dView(-1.1, 1.1, -1.1, 1.1, -1.1, 1.1, true)
 
 		// save
-		Save("/tmp/gosl/plt", "t_plot09")
+		PythonSave("/tmp/gosl/plt", "t_plot09")
 	}
 }
 
 func Test_plot10(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot10. ZoomWindow")
 
 	if chk.Verbose {
@@ -500,13 +500,13 @@ func Test_plot10(tst *testing.T) {
 		Plot(x, y4, &A{C: "cyan", L: "curve ond new again"})
 		Gll("xnew", "ynew", nil)
 
-		Save("/tmp/gosl/plt", "t_plot10")
+		PythonSave("/tmp/gosl/plt", "t_plot10")
 	}
 }
 
 func Test_plot11(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot11. LegendX")
 
 	if chk.Verbose {
@@ -528,13 +528,13 @@ func Test_plot11(tst *testing.T) {
 			&A{LegOut: true, LegNcol: 3},
 		)
 
-		Save("/tmp/gosl/plt", "t_plot11")
+		PythonSave("/tmp/gosl/plt", "t_plot11")
 	}
 }
 
 func Test_plot12(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot12. Grid2d")
 
 	if chk.Verbose {
@@ -568,13 +568,13 @@ func Test_plot12(tst *testing.T) {
 		HideAllBorders()
 		Equal()
 
-		Save("/tmp/gosl/plt", "t_plot12")
+		PythonSave("/tmp/gosl/plt", "t_plot12")
 	}
 }
 
 func Test_plot13(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot13. Grid3dZlevels")
 
 	if chk.Verbose {
@@ -610,13 +610,13 @@ func Test_plot13(tst *testing.T) {
 		DefaultTriad(1.1)
 		Default3dView(0, 1.1+dx, 0, 1.1+dy, 0, 1.1, true)
 
-		Save("/tmp/gosl/plt", "t_plot13")
+		PythonSave("/tmp/gosl/plt", "t_plot13")
 	}
 }
 
 func Test_plot14(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot14. Grid3dZlevels")
 
 	if chk.Verbose {
@@ -747,13 +747,13 @@ func Test_plot14(tst *testing.T) {
 		DefaultTriad(1.1)
 		Default3dView(0, 1.1+dx, 0, 1.1+dy, 0, 1.1, true)
 
-		Save("/tmp/gosl/plt", "t_plot14")
+		PythonSave("/tmp/gosl/plt", "t_plot14")
 	}
 }
 
 func Test_plot15(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot15. Grid3d")
 
 	if chk.Verbose {
@@ -802,19 +802,19 @@ func Test_plot15(tst *testing.T) {
 		DefaultTriad(1)
 		Default3dView(1, 8, 0, 4, -1, -0.5, true)
 
-		Save("/tmp/gosl/plt", "t_plot15")
+		PythonSave("/tmp/gosl/plt", "t_plot15")
 	}
 }
 
 func Test_plot16(tst *testing.T) {
 
-	//verbose()
+	verbose()
 	chk.PrintTitle("plot14. Sphere")
 
 	if chk.Verbose {
 		Reset(true, nil)
 		Sphere(nil, 1, 30, 30, &A{Surf: true})
 		Default3dView(-1.1, 1.1, -1.1, 1.1, -1.1, 1.1, true)
-		Save("/tmp/gosl/plt", "t_plot16")
+		PythonSave("/tmp/gosl/plt", "t_plot16")
 	}
 }

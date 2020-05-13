@@ -32,7 +32,7 @@ func Test_draw01(tst *testing.T) {
 	Equal()
 
 	if chk.Verbose {
-		Save("/tmp/gosl", "t_draw01")
+		PythonSave("/tmp/gosl", "t_draw01")
 	}
 }
 
@@ -59,7 +59,7 @@ func Test_draw02(tst *testing.T) {
 
 	if chk.Verbose {
 		Default3dView(0, 1, 0, 1, 0, 1, true)
-		Save("/tmp/gosl", "t_draw02")
+		PythonSave("/tmp/gosl", "t_draw02")
 	}
 }
 
@@ -76,6 +76,6 @@ func Test_draw03(tst *testing.T) {
 	if chk.Verbose {
 		Triad(1.5, "x", "y", "z", nil, nil)
 		Default3dView(-1, 1.5, -1.5, 2.5, -3.5, 0.5, true)
-		Save("/tmp/gosl", "t_draw03")
+		PythonSave("/tmp/gosl", "t_draw03")
 	}
 }

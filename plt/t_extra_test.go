@@ -46,7 +46,7 @@ func TestWaterfall01(tst *testing.T) {
 
 		Reset(true, nil)
 		Waterfall(X, T, Z, nil)
-		Save("/tmp/gosl/plt", "t_waterfall01")
+		PythonSave("/tmp/gosl/plt", "t_waterfall01")
 	}
 }
 
@@ -76,7 +76,7 @@ func TestSlopeInd01(tst *testing.T) {
 		}
 		draw(1)
 		draw(2)
-		Save("/tmp/gosl/plt", "t_slopeind01")
+		PythonSave("/tmp/gosl/plt", "t_slopeind01")
 	}
 }
 
@@ -108,7 +108,7 @@ func TestSlopeInd02(tst *testing.T) {
 		}
 		draw(1)
 		draw(2)
-		Save("/tmp/gosl/plt", "t_slopeind02")
+		PythonSave("/tmp/gosl/plt", "t_slopeind02")
 	}
 }
 
@@ -128,7 +128,7 @@ func TestSlopeInd03(tst *testing.T) {
 		SlopeInd(-2.0, 3.9, 4.0, 1, "2", true, true, false, nil, nil)
 		Grid(nil)
 		SetXlog()
-		Save("/tmp/gosl/plt", "t_slopeind03")
+		PythonSave("/tmp/gosl/plt", "t_slopeind03")
 	}
 }
 
@@ -148,7 +148,7 @@ func TestSlopeInd04(tst *testing.T) {
 		SlopeInd(-2.0, 3.9, 4.0, 1, "2", true, false, true, nil, nil)
 		Grid(nil)
 		SetYlog()
-		Save("/tmp/gosl/plt", "t_slopeind04")
+		PythonSave("/tmp/gosl/plt", "t_slopeind04")
 	}
 }
 
@@ -171,7 +171,7 @@ func TestMatrix01(tst *testing.T) {
 		}
 		Reset(true, &A{WidthPt: 500})
 		SubplotMatrix(len(xx), len(xx), cmds)
-		Save("/tmp/gosl/plt", "t_matrix01")
+		PythonSave("/tmp/gosl/plt", "t_matrix01")
 	}
 }
 
@@ -196,7 +196,7 @@ func TestMatrixSym01(tst *testing.T) {
 		}
 		Reset(true, &A{WidthPt: 500})
 		SubplotMatrixSym(len(xx), len(xx), cmds, nil)
-		Save("/tmp/gosl/plt", "t_matrixsym01")
+		PythonSave("/tmp/gosl/plt", "t_matrixsym01")
 	}
 }
 
@@ -213,7 +213,7 @@ func TestDrawArrow2d(tst *testing.T) {
 		DrawArrow2d([]float64{0, 0}, []float64{0, 88}, true, 1, nil)
 		Equal()
 		Grid(nil)
-		Save("/tmp/gosl/plt", "t_arrow2d")
+		PythonSave("/tmp/gosl/plt", "t_arrow2d")
 	}
 }
 
@@ -230,6 +230,6 @@ func TestDrawArrow3d(tst *testing.T) {
 		DrawArrow3d([]float64{0, 0, 0}, []float64{0, 0, 88}, true, 1, nil)
 		Camera(40, 30, nil)
 		Equal()
-		Save("/tmp/gosl/plt", "t_arrow3d")
+		PythonSave("/tmp/gosl/plt", "t_arrow3d")
 	}
 }

@@ -687,9 +687,9 @@ func Sca(axName string) {
 
 // functions to save figure ///////////////////////////////////////////////////////////////////////
 
-// Save saves figure after creating a directory
+// PythonSave executes python script and generate figure (creates the output directory)
 //  NOTE: the file name will be fnkey + .png (default) or .eps depending on the Reset function
-func Save(dirout, fnkey string) {
+func PythonSave(dirout, fnkey string) {
 	empty := dirout == "" || fnkey == ""
 	if empty {
 		chk.Panic("directory and filename key must not be empty\n")
@@ -703,17 +703,17 @@ func Save(dirout, fnkey string) {
 	}
 	fn := filepath.Join(dirout, fnkey+fileExt)
 	io.Ff(&bufferPy, "plt.savefig(r'%s', bbox_inches='tight', bbox_extra_artists=EXTRA_ARTISTS)\n", fn)
-	run(fn)
+	pythonRun(fn)
 }
 
-// Show shows figure
-func Show() {
+// PythonShow runs python and then shows figure
+func PythonShow() {
 	io.Ff(&bufferPy, "plt.show()\n")
-	run("")
+	pythonRun("")
 }
 
-// ShowSave shows figure and/or save figure
-func ShowSave(dirout, fnkey string) {
+// PythonShowSave runs python to show figure and then saves figure file
+func PythonShowSave(dirout, fnkey string) {
 	empty := dirout == "" || fnkey == ""
 	if empty {
 		chk.Panic("directory and filename key must not be empty\n")
@@ -730,7 +730,7 @@ func ShowSave(dirout, fnkey string) {
 	}
 	fn := filepath.Join(dirout, fnkey+fileExt)
 	io.Ff(&bufferPy, "fig%d.savefig(r'%s', bbox_inches='tight', bbox_extra_artists=EXTRA_ARTISTS)\n", uid, fn)
-	run("")
+	pythonRun("")
 }
 
 // generate arrays and matrices ///////////////////////////////////////////////////////////////////
@@ -787,8 +787,8 @@ func genStrArray(buf *bytes.Buffer, name string, u []string) {
 
 // call Python ////////////////////////////////////////////////////////////////////////////////////
 
-// run calls Python to generate plot
-func run(fn string) {
+// pythonRun calls Python to generate plot
+func pythonRun(fn string) {
 
 	// write file
 	io.WriteFile(TemporaryDir, &bufferEa, &bufferPy)
