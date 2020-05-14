@@ -23,64 +23,15 @@ var pythonBufferEa bytes.Buffer
 // flag indicating that Python axes3d ('AX3D') has been created
 var pythonAxes3dCreated bool
 
-// PythonCommands adds Python commands to be called when plotting
-func PythonCommands(text string) {
+// PythonAddCommands adds Python commands to be called when plotting
+func PythonAddCommands(text string) {
 	io.Ff(&pythonBuffer, text)
 }
 
-// PythonFile loads Python file and copy its contents to temporary buffer
-func PythonFile(filename string) {
+// PythonAddFile loads Python file and copy its contents to temporary buffer
+func PythonAddFile(filename string) {
 	b := io.ReadFile(filename)
 	io.Ff(&pythonBuffer, string(b))
-	return
-}
-
-// pythonShow runs python and then shows figure
-func pythonShow() {
-	io.Ff(&pythonBuffer, "plt.show()\n")
-	pythonRun("")
-}
-
-// pythonSave executes python script and generates figure (creates the output directory too)
-//  NOTE: the file name will be fnkey + .png (default) or .eps depending on the Reset function
-func pythonSave(fnkey string) {
-	empty := paramsControl.OutDir == "" || fnkey == ""
-	if empty {
-		chk.Panic("directory and filename key must not be empty\n")
-	}
-	err := os.MkdirAll(paramsControl.OutDir, 0777)
-	if err != nil {
-		chk.Panic("cannot create directory to save figure file:\n%v\n", err)
-	}
-	fileExt := ".png"
-	if paramsControl.FigEps {
-		fileExt = ".eps"
-	}
-	fn := filepath.Join(paramsControl.OutDir, fnkey+fileExt)
-	io.Ff(&pythonBuffer, "plt.savefig(r'%s', bbox_inches='tight', bbox_extra_artists=EXTRA_ARTISTS)\n", fn)
-	pythonRun(fn)
-}
-
-// pythonShowSave runs python to show figure and then saves figure file
-func pythonShowSave(fnkey string) {
-	empty := paramsControl.OutDir == "" || fnkey == ""
-	if empty {
-		chk.Panic("directory and filename key must not be empty\n")
-	}
-	uid := pythonGenUID()
-	io.Ff(&pythonBuffer, "fig%d = plt.gcf()\n", uid)
-	io.Ff(&pythonBuffer, "plt.show()\n")
-	err := os.MkdirAll(paramsControl.OutDir, 0777)
-	if err != nil {
-		chk.Panic("cannot create directory to save figure file:\n%v\n", err)
-	}
-	fileExt := ".png"
-	if paramsControl.FigEps {
-		fileExt = ".eps"
-	}
-	fn := filepath.Join(paramsControl.OutDir, fnkey+fileExt)
-	io.Ff(&pythonBuffer, "fig%d.savefig(r'%s', bbox_inches='tight', bbox_extra_artists=EXTRA_ARTISTS)\n", uid, fn)
-	pythonRun("")
 }
 
 // pythonInit initalizes python buffers and sets default values
@@ -132,11 +83,50 @@ func pythonInit() {
 	*/
 }
 
-// pythonRun calls Python to generate plot
-func pythonRun(fn string) {
-	// write file
-	goslPy := filepath.Join(paramsControl.TmpDir, "gosl.py")
+// pythonSave executes python script and generates figure (creates the output directory too)
+//  NOTE: the file name will be fnkey + .png (default) or .eps depending on the Reset function
+func pythonSave(fnkey string, show bool, skipRun bool) {
+	// check filename
+	empty := paramsControl.OutDir == "" || fnkey == ""
+	if empty {
+		chk.Panic("directory and filename key must not be empty\n")
+	}
+
+	// create output directory
+	err := os.MkdirAll(paramsControl.OutDir, 0777)
+	if err != nil {
+		chk.Panic("cannot create directory to save figure file:\n%v\n", err)
+	}
+
+	// set figure file extension
+	fileExt := ".png"
+	if paramsControl.FigEps {
+		fileExt = ".eps"
+	}
+
+	// set figure handle
+	uid := pythonGenUID()
+	io.Ff(&pythonBuffer, "fig%d = plt.gcf()\n", uid)
+
+	// show figure
+	if show {
+		io.Ff(&pythonBuffer, "plt.show()\n")
+	}
+
+	// save figure
+	fn := filepath.Join(paramsControl.OutDir, fnkey+fileExt)
+	io.Ff(&pythonBuffer, "fig%d.savefig(r'%s', bbox_inches='tight', bbox_extra_artists=EXTRA_ARTISTS)\n", uid, fn)
+
+	// write python file
+	goslPy := filepath.Join(paramsControl.TmpDir, "__gosl__temporary__.py")
 	io.WriteFile(goslPy, &pythonBufferEa, &pythonBuffer)
+
+	// skip running python command
+	if skipRun {
+		return
+	}
+
+	// get python command
 	python := os.Getenv("PYTHON")
 	if python == "" {
 		python = "python"
@@ -149,17 +139,13 @@ func pythonRun(fn string) {
 	cmd.Stderr = &serr
 
 	// call Python
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		chk.Panic("call to Python failed:\n%v\n", serr.String())
 	}
 
-	// show filename
-	if fn != "" {
-		io.Pf("file <%s> written\n", fn)
-	}
-
 	// show output
+	io.Pf("file <%s> written\n", fn)
 	io.Pf("%s", out.String())
 }
 

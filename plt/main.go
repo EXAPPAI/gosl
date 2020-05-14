@@ -49,7 +49,7 @@ func Init(params ...ParamsControl) {
 // Save saves figure
 func Save(fnkey string) {
 	if paramsControl.UsePython {
-		pythonSave(fnkey)
+		pythonSave(fnkey, false, false)
 		return
 	}
 }
