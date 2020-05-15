@@ -42,6 +42,8 @@ func Init(params ...ParamsControl) {
 	}
 	if paramsControl.UsePython {
 		pythonInit()
+	} else {
+		jserverInit()
 	}
 	initialized = true
 }

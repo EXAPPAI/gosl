@@ -12,11 +12,11 @@ import (
 	"github.com/cpmech/gosl/io"
 )
 
-func Test_PlotSimpleCurve(tst *testing.T) {
+func Test_PythonPlotSimpleCurve(tst *testing.T) {
 
 	// title of test
 	verbose()
-	chk.PrintTitle("PlotSimpleCurve")
+	chk.PrintTitle("PythonPlotSimpleCurve")
 
 	// clear previous file
 	goslPy := path.Join(paramsControl.TmpDir, "__gosl__temporary__.py")
