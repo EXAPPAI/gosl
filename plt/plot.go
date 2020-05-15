@@ -4,27 +4,26 @@
 
 package plt
 
-import "github.com/cpmech/gosl/io"
+import (
+	"github.com/cpmech/gosl/chk"
+	"github.com/gobwas/ws"
+	"github.com/gobwas/ws/wsutil"
+)
 
-// Plot plots x-y series
-func Plot(x, y []float64, params ...ParamsPlot) (sx, sy string) {
-	if !paramsControl.UsePython {
-		return
+// Plot plots curve
+func Plot(x, y []float64, style ...CurveStyle) {
+	var s CurveStyle
+	if len(style) > 0 {
+		s = style[0]
+	} else {
+		s = DefaultCurveStyle
 	}
-	uid := pythonGenUID()
-	sx = io.Sf("x%d", uid)
-	sy = io.Sf("y%d", uid)
-	pythonGen2Arrays(&pythonBuffer, sx, sy, x, y)
-	io.Ff(&pythonBuffer, "plt.plot(%s,%s", sx, sy)
-	pythonPutParams(params)
-	return
-}
+	// curves.List = append(curves.List, Curve{X: x, Y: y, Style: s})
+	curve := &Curve{X: x, Y: y, Style: s}
+	json := curve.Encode()
+	err := wsutil.WriteClientMessage(connection, ws.OpText, json)
+	if err != nil {
+		chk.Panic("cannot send curve data to server")
+	}
 
-// PlotOne plots one point @ (x,y)
-func PlotOne(x, y float64, params ...ParamsPlot) {
-	if !paramsControl.UsePython {
-		return
-	}
-	io.Ff(&pythonBuffer, "plt.plot(%23.15e,%23.15e", x, y)
-	// updateBufferAndClose(&pythonBuffer, params, false, false)
 }

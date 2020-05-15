@@ -14,9 +14,5 @@ while true; do
     echo
     echo
     echo
-    # go test -test.run="InitDefault"
-    # go test -test.run="InitWithParams"
-    # go test -test.run="HideBorders"
-    # go test -test.run="PythonPlotSimpleCurve"
-    go test -test.run="JserverPlotSimpleCurve"
+    go test -test.run="PlotSimpleCurve"
 done

@@ -4,50 +4,95 @@
 
 package plt
 
+import (
+	"bytes"
+	"context"
+	"net"
+	"time"
+
+	"github.com/cpmech/gosl/chk"
+	"github.com/cpmech/gosl/io"
+	"github.com/cpmech/gosl/utl"
+	"github.com/gobwas/ws"
+)
+
+// ParamsControl holds the control parameters
+// type ParamsControl struct {
+// 	TmpDir string // temporary dir for gosl.py file. default = "/tmp/gosl/plt"
+// 	OutDir string // output directory for figures. default = "/tmp/gosl/plt"
+// }
+
 // default control arguments
-var paramsControl = &ParamsControl{
-	UsePython: false,
-	TmpDir:    "/tmp/gosl/plt",
-	OutDir:    "/tmp/gosl/plt",
-	FigEps:    false,
-	FigDpi:    150,
-	FigProp:   0.75,
-	FigWidth:  400,
+// var paramsControl = &ParamsControl{
+// TmpDir: "/tmp/gosl/plt",
+// OutDir: "/tmp/gosl/plt",
+// }
+
+// TmpDir:= "/tmp/gosl/plt"
+// OutDir:= "/tmp/gosl/plt"
+
+var curves Curves
+var connection net.Conn
+
+// Reset removes all curves
+func Reset() {
+	curves.List = nil
 }
 
+func Show() {
+	buf := new(bytes.Buffer)
+	enc := utl.NewEncoder(buf, "json")
+	enc.Encode(&curves)
+	io.Pf(">> %v\n", string(buf.Bytes()))
+}
+
+func Begin() {
+	dur, err := time.ParseDuration("1m")
+	if err != nil {
+		chk.Panic("INTERNAL ERROR: cannot parse duration")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), dur)
+	defer cancel()
+	connection, _, _, err = ws.DefaultDialer.Dial(ctx, "ws://localhost:8081/provider")
+	if err != nil {
+		chk.Panic("Cannot connect to plotting server")
+	}
+}
+
+/*
 // flag indicating that the system has been initialized
-var initialized = false
+// var initialized = false
 
 // Init initializes the system. "params" is optional (only one is considered)
 func Init(params ...ParamsControl) {
 	if len(params) > 0 {
 		p := &params[0]
-		paramsControl.UsePython = p.UsePython
-		paramsControl.FigEps = p.FigEps
 		if p.TmpDir != "" {
 			paramsControl.TmpDir = p.TmpDir
 		}
 		if p.OutDir != "" {
 			paramsControl.OutDir = p.OutDir
 		}
-		if p.FigDpi > 0 {
-			paramsControl.FigDpi = p.FigDpi
-		}
-		if p.FigProp > 0 {
-			paramsControl.FigProp = p.FigProp
-		}
-		if p.FigWidth > 0 {
-			paramsControl.FigWidth = p.FigWidth
-		}
+		// if p.FigDpi > 0 {
+		// 	paramsControl.FigDpi = p.FigDpi
+		// }
+		// if p.FigProp > 0 {
+		// 	paramsControl.FigProp = p.FigProp
+		// }
+		// if p.FigWidth > 0 {
+		// 	paramsControl.FigWidth = p.FigWidth
+		// }
 	}
-	if paramsControl.UsePython {
-		pythonInit()
-	} else {
-		jserverInit()
-	}
-	initialized = true
+	// if paramsControl.UsePython {
+	// 	pythonInit()
+	// } else {
+	// 	jserverInit()
+	// }
+	// initialized = true
 }
+*/
 
+/*
 // Save saves figure
 func Save(fnkey string) {
 	if paramsControl.UsePython {
@@ -55,6 +100,7 @@ func Save(fnkey string) {
 		return
 	}
 }
+*/
 
 /*
 // Annotate adds annotation to plot
