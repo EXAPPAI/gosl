@@ -13,37 +13,37 @@ import (
 // CurveStyle holds definitions for the style of curves
 type CurveStyle struct {
 	// lines
-	LineColor string  // color
-	LineAlpha float64 // alpha (0, 1]. A<1e-14 => A=1.0
-	LineStyle string  // style
-	LineWidth float64 // width
+	LineColor string  `json:"lineColor"` // color
+	LineAlpha float64 `json:"lineAlpha"` // alpha (0, 1]. A<1e-14 => A=1.0
+	LineStyle string  `json:"lineStyle"` // style
+	LineWidth float64 `json:"lineWidth"` // width
 
 	// markers
-	MarkerType      string  // type
-	MarkerImg       string  // image filename
-	MarkerColor     string  // color
-	MarkerAlpha     float64 // alpha (0, 1]
-	MarkerSize      float64 // size; when using images, set markerSize=0 to use the image width
-	MarkerEvery     float64 // mark-every
-	MarkerLineColor string  // edge color
-	MarkerLineWidth float64 // edge width
-	MarkerLineStyle string  // edge style
-	MarkerIsVoid    bool    // void marker (draw edge only)
+	MarkerType      string  `json:"markerType"`      // type
+	MarkerImg       string  `json:"markerImg"`       // image filename
+	MarkerColor     string  `json:"markerColor"`     // color
+	MarkerAlpha     float64 `json:"markerAlpha"`     // alpha (0, 1]
+	MarkerSize      float64 `json:"markerSize"`      // size; when using images, set markerSize=0 to use the image width
+	MarkerEvery     float64 `json:"markerEvery"`     // mark-every
+	MarkerLineColor string  `json:"markerLineColor"` // edge color
+	MarkerLineWidth float64 `json:"markerLineWidth"` // edge width
+	MarkerLineStyle string  `json:"markerLineStyle"` // edge style
+	MarkerIsVoid    bool    `json:"markerIsVoid"`    // void marker (draw edge only)
 }
 
 // Curve defines the curve data
 type Curve struct {
-	Style         CurveStyle // line and marker arguments
-	Label         string     // curve name or connection pair such as 'San Francisco -> Los Angeles'
-	X             []float64  // x-coordinates
-	Y             []float64  // y-coordinates
-	Z             []float64  // [optional] z-coordinates
-	Kind          string     // e.g. connection, city, fortress, base, mine, ...
-	TagFirstPoint bool       // tag first point with label
+	Style         CurveStyle `json:"style"`         // line and marker arguments
+	Label         string     `json:"label"`         // curve name or connection pair such as 'San Francisco -> Los Angeles'
+	X             []float64  `json:"x"`             // x-coordinates
+	Y             []float64  `json:"y"`             // y-coordinates
+	Z             []float64  `json:"z,omitempty"`   // [optional] z-coordinates
+	Kind          string     `json:"kind"`          // e.g. connection, city, fortress, base, mine, ...
+	TagFirstPoint bool       `json:"tagFirstPoint"` // tag first point with label
 
 	// for Python only
-	FigElevation float64 // figure elevation (z-index)
-	NoClip       bool    // turn clipping off
+	FigElevation float64 `json:"figElevation"` // figure elevation (z-index)
+	NoClip       bool    `json:"noClip"`       // turn clipping off
 }
 
 // Encode encodes Curve into JSON string
