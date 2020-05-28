@@ -4,17 +4,13 @@
 
 package plt
 
-import (
-	"bytes"
-	"context"
-	"net"
-	"time"
+// clientType holds the global variables and manages communication
+type clientType struct {
+	session *serverSession
+	python  *pythonSession
+}
 
-	"github.com/cpmech/gosl/chk"
-	"github.com/cpmech/gosl/io"
-	"github.com/cpmech/gosl/utl"
-	"github.com/gobwas/ws"
-)
+var client *clientType
 
 // ParamsControl holds the control parameters
 // type ParamsControl struct {
@@ -31,33 +27,57 @@ import (
 // TmpDir:= "/tmp/gosl/plt"
 // OutDir:= "/tmp/gosl/plt"
 
-var curves Curves
-var connection net.Conn
-
 // Reset removes all curves
 func Reset() {
-	curves.List = nil
+	// curves.List = nil
 }
 
+// Show shows figure
 func Show() {
-	buf := new(bytes.Buffer)
-	enc := utl.NewEncoder(buf, "json")
-	enc.Encode(&curves)
-	io.Pf(">> %v\n", string(buf.Bytes()))
+	// buf := new(bytes.Buffer)
+	// enc := utl.NewEncoder(buf, "json")
+	// enc.Encode(&curves)
+	// io.Pf(">> %v\n", string(buf.Bytes()))
 }
 
-func Begin() {
-	dur, err := time.ParseDuration("1m")
-	if err != nil {
-		chk.Panic("INTERNAL ERROR: cannot parse duration")
+// Begin begins sequence of plot commands (e.g. connects to the server)
+func Begin(options ...struct {
+	SessionName string // name of session when using plotting server
+	SessionPort string // server port using plotting server [default = 8081]
+	UsePython   bool   // use python's matplotlib instead of plotting server
+}) {
+	// get options
+	name := ""
+	port := "8081"
+	python := false
+	if len(options) > 0 {
+		name = options[0].SessionName
+		port = options[0].SessionPort
+		python = options[0].UsePython
+		if port == "" {
+			port = "8081"
+		}
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), dur)
-	defer cancel()
-	connection, _, _, err = ws.DefaultDialer.Dial(ctx, "ws://localhost:8081/provider")
-	if err != nil {
-		chk.Panic("Cannot connect to plotting server")
+
+	// handle python case
+	if python {
+		python := newPythonSession()
+		client = &clientType{session: nil, python: python}
+		return
 	}
+
+	// handle plotting server case
+	session := newServerSession(name, port)
+	client = &clientType{session: session, python: nil}
 }
+
+// send sends message to server (or Python buffer)
+// func (o *clientType) send(message []byte) {
+// 	err := wsutil.WriteClientMessage(client.connection, ws.OpText, message)
+// 	if err != nil {
+// 		chk.Panic("cannot send message to server")
+// 	}
+// }
 
 /*
 // flag indicating that the system has been initialized

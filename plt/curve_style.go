@@ -4,11 +4,7 @@
 
 package plt
 
-import (
-	"bytes"
-
-	"github.com/cpmech/gosl/utl"
-)
+import "github.com/cpmech/gosl/io"
 
 // CurveStyle holds definitions for the style of curves
 type CurveStyle struct {
@@ -31,34 +27,6 @@ type CurveStyle struct {
 	MarkerIsVoid    bool    `json:"markerIsVoid"`    // void marker (draw edge only)
 }
 
-// Curve defines the curve data
-type Curve struct {
-	Style         CurveStyle `json:"style"`         // line and marker arguments
-	Label         string     `json:"label"`         // curve name or connection pair such as 'San Francisco -> Los Angeles'
-	X             []float64  `json:"x"`             // x-coordinates
-	Y             []float64  `json:"y"`             // y-coordinates
-	Z             []float64  `json:"z,omitempty"`   // [optional] z-coordinates
-	Kind          string     `json:"kind"`          // e.g. connection, city, fortress, base, mine, ...
-	TagFirstPoint bool       `json:"tagFirstPoint"` // tag first point with label
-
-	// for Python only
-	FigElevation float64 `json:"figElevation"` // figure elevation (z-index)
-	NoClip       bool    `json:"noClip"`       // turn clipping off
-}
-
-// Encode encodes Curve into JSON string
-func (o *Curve) Encode() []byte {
-	buf := new(bytes.Buffer)
-	enc := utl.NewEncoder(buf, "json")
-	enc.Encode(o)
-	return buf.Bytes()
-}
-
-// Curves holds a list of curves
-type Curves struct {
-	List []Curve
-}
-
 // DefaultCurveStyle defines the default style
 var DefaultCurveStyle = CurveStyle{
 	// lines
@@ -78,4 +46,45 @@ var DefaultCurveStyle = CurveStyle{
 	MarkerLineWidth: 2,
 	MarkerLineStyle: "none",
 	MarkerIsVoid:    false,
+}
+
+// PythonParams returns curve style as python options
+func (o CurveStyle) PythonParams() (l string) {
+	// lines
+	if o.LineColor != "" {
+		l += io.Sf(",color='%s'", o.LineColor)
+	}
+	if o.LineAlpha > 0 {
+		l += io.Sf(",alpha=%g", o.LineAlpha)
+	}
+	if o.LineStyle != "" {
+		l += io.Sf(",linestyle='%s'", o.LineStyle)
+	}
+	if o.LineWidth > 0 {
+		l += io.Sf(",lw=%g", o.LineWidth)
+	}
+
+	// markers
+	if o.MarkerType != "" {
+		l += io.Sf(",marker='%s'", o.MarkerType)
+	}
+	if o.MarkerSize > 0 {
+		l += io.Sf(",ms=%d", o.MarkerSize)
+	}
+	if o.MarkerEvery > 0 {
+		l += io.Sf(",markevery=%d", o.MarkerEvery)
+	}
+	if o.MarkerLineColor != "" {
+		l += io.Sf(",markeredgecolor='%s'", o.MarkerLineColor)
+	}
+	if o.MarkerLineWidth > 0 {
+		l += io.Sf(",mew=%g", o.MarkerLineWidth)
+	}
+	if o.MarkerIsVoid {
+		l += ",markerfacecolor='none'"
+		if o.MarkerLineColor == "" {
+			l += io.Sf(",markeredgecolor='%s'", o.LineColor)
+		}
+	}
+	return
 }

@@ -6,6 +6,7 @@ package plt
 
 import (
 	"testing"
+	"time"
 
 	"github.com/cpmech/gosl/chk"
 	"github.com/cpmech/gosl/io"
@@ -19,7 +20,8 @@ func Test_PlotSimpleCurve(tst *testing.T) {
 
 	Begin()
 	Plot([]float64{0, 1, 2, 3}, []float64{0, 1, 2, 3})
-	// Plot([]float64{0, 1, 2, 3}, []float64{0, 1, 4, 9}, CurveStyle{MarkerType: "*"})
+	time.Sleep(3000 * time.Millisecond)
+	Plot([]float64{0, 1, 2, 3}, []float64{0, 1, 4, 9}, CurveStyle{MarkerType: "*"})
 	io.Pf("curves = %v\n", curves)
 	Show()
 }

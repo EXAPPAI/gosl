@@ -4,12 +4,6 @@
 
 package plt
 
-import (
-	"github.com/cpmech/gosl/chk"
-	"github.com/gobwas/ws"
-	"github.com/gobwas/ws/wsutil"
-)
-
 // Plot plots curve
 func Plot(x, y []float64, style ...CurveStyle) {
 	var s CurveStyle
@@ -18,12 +12,6 @@ func Plot(x, y []float64, style ...CurveStyle) {
 	} else {
 		s = DefaultCurveStyle
 	}
-	// curves.List = append(curves.List, Curve{X: x, Y: y, Style: s})
 	curve := &Curve{X: x, Y: y, Style: s}
-	json := curve.Encode()
-	err := wsutil.WriteClientMessage(connection, ws.OpText, json)
-	if err != nil {
-		chk.Panic("cannot send curve data to server")
-	}
-
+	client.send(curve.Encode())
 }
