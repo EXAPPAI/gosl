@@ -18,15 +18,15 @@ import (
 	"github.com/google/uuid"
 )
 
-// serverSession holds information of the current plotting session
-type serverSession struct {
-	ID         string   `json:"id"`
-	Name       string   `json:"name"`
-	connection net.Conn `json:"-"`
+// clientBrowser holds information of the current plotting session
+type clientBrowser struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	connection net.Conn
 }
 
-// newServerSession creates new serverSession
-func newServerSession(name string, port string) (o *serverSession) {
+// newClientBrowser creates new clientBrowser
+func newClientBrowser(name string, port string) (o *clientBrowser) {
 	// connect to server
 	dur, err := time.ParseDuration("1m")
 	if err != nil {
@@ -36,7 +36,7 @@ func newServerSession(name string, port string) (o *serverSession) {
 	defer cancel()
 	conn, _, _, err := ws.DefaultDialer.Dial(ctx, "ws://localhost:"+port+"/provider")
 	if err != nil {
-		chk.Panic("Cannot connect to plotting server")
+		chk.Panic("cannot connect to plotting server")
 	}
 
 	// make new object
@@ -44,11 +44,11 @@ func newServerSession(name string, port string) (o *serverSession) {
 	if name == "" {
 		name = strings.Split(id, "-")[0]
 	}
-	return &serverSession{ID: id, Name: name, connection: conn}
+	return &clientBrowser{ID: id, Name: name, connection: conn}
 }
 
 // encode encodes Session into JSON string
-func (o *serverSession) encode() []byte {
+func (o *clientBrowser) encode() []byte {
 	buf := new(bytes.Buffer)
 	enc := utl.NewEncoder(buf, "json")
 	enc.Encode(o)
@@ -56,7 +56,7 @@ func (o *serverSession) encode() []byte {
 }
 
 // send sends message to server
-func (o *serverSession) send(message []byte) {
+func (o *clientBrowser) send(message []byte) {
 	err := wsutil.WriteClientMessage(o.connection, ws.OpText, message)
 	if err != nil {
 		chk.Panic("cannot send message to server")

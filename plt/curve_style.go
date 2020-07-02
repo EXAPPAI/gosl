@@ -20,7 +20,7 @@ type CurveStyle struct {
 	MarkerColor     string  `json:"markerColor"`     // color
 	MarkerAlpha     float64 `json:"markerAlpha"`     // alpha (0, 1]
 	MarkerSize      float64 `json:"markerSize"`      // size; when using images, set markerSize=0 to use the image width
-	MarkerEvery     float64 `json:"markerEvery"`     // mark-every
+	MarkerEvery     int     `json:"markerEvery"`     // mark-every
 	MarkerLineColor string  `json:"markerLineColor"` // edge color
 	MarkerLineWidth float64 `json:"markerLineWidth"` // edge width
 	MarkerLineStyle string  `json:"markerLineStyle"` // edge style
@@ -69,7 +69,7 @@ func (o CurveStyle) pythonParams() (l string) {
 		l += io.Sf(",marker='%s'", o.MarkerType)
 	}
 	if o.MarkerSize > 0 {
-		l += io.Sf(",ms=%d", o.MarkerSize)
+		l += io.Sf(",ms=%g", o.MarkerSize)
 	}
 	if o.MarkerEvery > 0 {
 		l += io.Sf(",markevery=%d", o.MarkerEvery)

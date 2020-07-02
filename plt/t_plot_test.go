@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/cpmech/gosl/chk"
-	"github.com/cpmech/gosl/io"
 )
 
 func Test_PlotSimpleCurve(tst *testing.T) {
@@ -18,10 +17,13 @@ func Test_PlotSimpleCurve(tst *testing.T) {
 	verbose()
 	chk.PrintTitle("PlotSimpleCurve")
 
+	x1 := []float64{0, 1, 2, 3}
+	y1 := []float64{0, 1, 2, 3}
+	y2 := []float64{0, 1, 4, 9}
+
 	Begin()
-	Plot([]float64{0, 1, 2, 3}, []float64{0, 1, 2, 3})
+	Plot(x1, y1)
 	time.Sleep(3000 * time.Millisecond)
-	Plot([]float64{0, 1, 2, 3}, []float64{0, 1, 4, 9}, CurveStyle{MarkerType: "*"})
-	io.Pf("curves = %v\n", curves)
-	Show()
+	Plot(x1, y2, CurveStyle{MarkerType: "*"})
+	// Show()
 }

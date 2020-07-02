@@ -10,16 +10,16 @@ import (
 	"github.com/cpmech/gosl/io"
 )
 
-// pythonSession holds data for python (matplotlib) plotting session
-type pythonSession struct {
+// clientPython holds data for python (matplotlib) plotting session
+type clientPython struct {
 	buffer    *bytes.Buffer // buffer holding Python commands
 	bufferEa  *bytes.Buffer // buffer holding Python extra artists commands
 	created3d bool          // flag indicating that Python axes3d ('AX3D') has been created
 }
 
-// newPythonSession creates new pythonSession
-func newPythonSession() (o *pythonSession) {
-	return &pythonSession{
+// newClientPython creates new clientPython
+func newClientPython() (o *clientPython) {
+	return &clientPython{
 		buffer:    new(bytes.Buffer),
 		bufferEa:  new(bytes.Buffer),
 		created3d: false,
@@ -27,7 +27,7 @@ func newPythonSession() (o *pythonSession) {
 }
 
 // write writes commands to buffer
-func (o *pythonSession) write(commands string, extraArtists ...string) {
+func (o *clientPython) write(commands string, extraArtists ...string) {
 	io.Ff(o.buffer, commands)
 	if len(extraArtists) > 0 {
 		ea := extraArtists[0]
@@ -36,12 +36,12 @@ func (o *pythonSession) write(commands string, extraArtists ...string) {
 }
 
 // uid returns unique identifier
-func (o *pythonSession) uid() int {
+func (o *clientPython) uid() int {
 	return o.buffer.Len()
 }
 
 // plot plots x-y series
-func (o *pythonSession) plot(curve *Curve) {
+func (o *clientPython) plot(curve *Curve) {
 	uid := o.uid()
 	sx := io.Sf("x%d", uid)
 	sy := io.Sf("y%d", uid)
@@ -52,7 +52,7 @@ func (o *pythonSession) plot(curve *Curve) {
 }
 
 // plotOne plots one point
-func (o *pythonSession) plotOne(x, y float64, style ...CurveStyle) {
+func (o *clientPython) plotOne(x, y float64, style ...CurveStyle) {
 	io.Ff(o.buffer, "plt.plot(%23.15e,%23.15e", x, y)
 	if len(style) > 0 {
 		io.Ff(o.buffer, style[0].pythonParams())
