@@ -47,8 +47,8 @@ func newServerSession(name string, port string) (o *serverSession) {
 	return &serverSession{ID: id, Name: name, connection: conn}
 }
 
-// Encode encodes Session into JSON string
-func (o *serverSession) Encode() []byte {
+// encode encodes Session into JSON string
+func (o *serverSession) encode() []byte {
 	buf := new(bytes.Buffer)
 	enc := utl.NewEncoder(buf, "json")
 	enc.Encode(o)

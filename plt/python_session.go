@@ -47,11 +47,15 @@ func (o *pythonSession) plot(curve *Curve) {
 	sy := io.Sf("y%d", uid)
 	pythonGen2Arrays(o.buffer, sx, sy, curve.X, curve.Y)
 	io.Ff(o.buffer, "plt.plot(%s,%s", sx, sy)
+	io.Ff(o.buffer, curve.pythonParams())
 	io.Ff(o.buffer, ")\n")
 }
 
 // plotOne plots one point
 func (o *pythonSession) plotOne(x, y float64, style ...CurveStyle) {
 	io.Ff(o.buffer, "plt.plot(%23.15e,%23.15e", x, y)
+	if len(style) > 0 {
+		io.Ff(o.buffer, style[0].pythonParams())
+	}
 	io.Ff(o.buffer, ")\n")
 }
