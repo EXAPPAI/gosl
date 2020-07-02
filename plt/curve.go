@@ -22,8 +22,8 @@ type Curve struct {
 	TagFirstPoint bool       `json:"tagFirstPoint"` // tag first point with label
 
 	// for Python only
-	Zindex float64 `json:"-"` // figure elevation (z-index)
-	NoClip bool    `json:"-"` // turn clipping off
+	Zindex int  `json:"-"` // figure elevation (z-index)
+	NoClip bool `json:"-"` // turn clipping off
 }
 
 // Encode encodes Curve into JSON string
@@ -35,8 +35,8 @@ func (o *Curve) Encode() []byte {
 }
 
 // PythonParams returns python options
-func (o *Curve) PythonParams() (l string) {
-	l = o.Style.PythonParams()
+func (o *Curve) pythonParams() (l string) {
+	l = o.Style.pythonParams()
 	if o.Label != "" {
 		l += io.Sf(",label='%s'", o.Label)
 	}

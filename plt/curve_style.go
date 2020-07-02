@@ -49,7 +49,7 @@ var DefaultCurveStyle = CurveStyle{
 }
 
 // PythonParams returns curve style as python options
-func (o CurveStyle) PythonParams() (l string) {
+func (o CurveStyle) pythonParams() (l string) {
 	// lines
 	if o.LineColor != "" {
 		l += io.Sf(",color='%s'", o.LineColor)
