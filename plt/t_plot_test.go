@@ -21,8 +21,13 @@ func Test_PlotSimpleCurve(tst *testing.T) {
 	y1 := []float64{0, 1, 2, 3}
 	y2 := []float64{0, 1, 4, 9}
 
-	Begin("myplot")
+	Begin("myplot1")
 	Plot(x1, y1, "curve1")
-	time.Sleep(3000 * time.Millisecond)
 	Plot(x1, y2, "curve2", CurveStyle{MarkerType: "*"})
+
+	time.Sleep(3000 * time.Millisecond)
+
+	Begin("myplot2")
+	Plot(x1, y1, "curveX")
+	Plot(x1, y2, "curveY", CurveStyle{MarkerType: "*"})
 }

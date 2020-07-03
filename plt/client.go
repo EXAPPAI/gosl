@@ -4,6 +4,8 @@
 
 package plt
 
+import "github.com/cpmech/gosl/chk"
+
 // clientType holds the global variables and manages communication
 type clientType struct {
 	browser *clientBrowser
@@ -18,6 +20,11 @@ func Begin(name string, options ...struct {
 	Port   string // server port when using the browser [default = 8081]
 	Python bool   // use python's matplotlib instead of plotting server
 }) {
+	// check
+	if name == "" {
+		chk.Panic("The name of the plot cannot be empty")
+	}
+
 	// get options
 	port := "8081"
 	python := false
