@@ -20,35 +20,40 @@ import (
 
 // clientBrowser holds information of the current plotting session
 type clientBrowser struct {
-	ID         string `json:"id"`
-	Name       string `json:"name"`
+	id         string
+	name       string
 	connection net.Conn
+}
+
+// action holds the data to be sent to the browser
+type response struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Action  string `json:"action"`
+	Payload string `json:"payload"`
 }
 
 // newClientBrowser creates new clientBrowser
 func newClientBrowser(name string, port string) (o *clientBrowser) {
-	// connect to server
 	dur, err := time.ParseDuration("1m")
 	if err != nil {
 		chk.Panic("INTERNAL ERROR: cannot parse duration")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), dur)
 	defer cancel()
-	conn, _, _, err := ws.DefaultDialer.Dial(ctx, "ws://localhost:"+port+"/provider")
+	connection, _, _, err := ws.DefaultDialer.Dial(ctx, "ws://localhost:"+port+"/provider")
 	if err != nil {
 		chk.Panic("cannot connect to plotting server")
 	}
-
-	// make new object
 	id := uuid.New().String()
 	if name == "" {
 		name = strings.Split(id, "-")[0]
 	}
-	return &clientBrowser{ID: id, Name: name, connection: conn}
+	return &clientBrowser{id, name, connection}
 }
 
 // encode encodes Session into JSON string
-func (o *clientBrowser) encode() []byte {
+func (o *response) encode() []byte {
 	buf := new(bytes.Buffer)
 	enc := utl.NewEncoder(buf, "json")
 	enc.Encode(o)
@@ -61,4 +66,10 @@ func (o *clientBrowser) send(message []byte) {
 	if err != nil {
 		chk.Panic("cannot send message to server")
 	}
+}
+
+// plot plots x-y series
+func (o *clientBrowser) plot(curve *Curve) {
+	data := &response{o.id, o.name, "plot", string(curve.Encode())}
+	o.send(data.encode())
 }

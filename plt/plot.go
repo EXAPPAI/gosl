@@ -5,5 +5,26 @@
 package plt
 
 // Plot plots curve
-func Plot(x, y []float64, style ...CurveStyle) {
+func Plot(x, y []float64, label string, style ...CurveStyle) {
+	var s CurveStyle
+	if len(style) > 0 {
+		s = style[0]
+	} else {
+		s = DefaultCurveStyle
+	}
+	curve := &Curve{
+		Style:         s,
+		Label:         label,
+		X:             x,
+		Y:             y,
+		Kind:          "",
+		TagFirstPoint: false,
+		Zindex:        0,
+		NoClip:        false,
+	}
+	if client.browser == nil {
+		client.python.plot(curve)
+	} else {
+		client.browser.plot(curve)
+	}
 }

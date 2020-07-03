@@ -13,17 +13,15 @@ type clientType struct {
 var client *clientType
 
 // Begin begins sequence of plot commands (e.g. connects to the server)
-func Begin(options ...struct {
-	Name   string // name of plot when using the browser
+// name is the name of the plot (required)
+func Begin(name string, options ...struct {
 	Port   string // server port when using the browser [default = 8081]
 	Python bool   // use python's matplotlib instead of plotting server
 }) {
 	// get options
-	name := ""
 	port := "8081"
 	python := false
 	if len(options) > 0 {
-		name = options[0].Name
 		port = options[0].Port
 		python = options[0].Python
 		if port == "" {
