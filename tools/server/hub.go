@@ -18,11 +18,12 @@ import (
 
 // Hub implements the set of peers
 type Hub struct {
-	providers      map[net.Conn]bool
-	observers      map[net.Conn]bool
-	chanRemoveConn chan net.Conn
-	chanBroadcast  chan []byte
-	messages       [][]byte
+	providers        map[net.Conn]bool
+	observers        map[net.Conn]bool
+	chanRemoveConn   chan net.Conn
+	chanBroadcast    chan []byte
+	chanRecvObserver chan []byte
+	messages         *Messages
 }
 
 // NewHub creates a new Hub
@@ -32,7 +33,8 @@ func NewHub() *Hub {
 		make(map[net.Conn]bool),
 		make(chan net.Conn),
 		make(chan []byte),
-		[][]byte{},
+		make(chan []byte),
+		NewMessages(),
 	}
 	go o.run()
 	return o
@@ -72,11 +74,21 @@ func (o *Hub) AddObserver(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("### added observer ###")
 	o.observers[conn] = true
-	if len(o.messages) > 0 {
-		for _, message := range o.messages {
-			o.notifyObservers(message)
+	o.messages.SendAll(func(message []byte) {
+		o.notifyObservers(message)
+	})
+	go func() {
+		defer conn.Close()
+		log.Printf("+++ waiting for observer messages +++")
+		for {
+			msg, _, err := wsutil.ReadClientData(conn)
+			if err != nil {
+				o.chanRemoveConn <- conn
+				return
+			}
+			o.chanRecvObserver <- msg
 		}
-	}
+	}()
 }
 
 // notifyObservers notifies all observers
@@ -88,6 +100,18 @@ func (o *Hub) notifyObservers(message []byte) {
 			conn.Close()
 			delete(o.observers, conn)
 		}
+	}
+}
+
+// handleMessageFromObserver handles message from observer
+func (o *Hub) handleMessageFromObserver(message []byte) {
+	response := ParseResponse(message)
+	if response == nil {
+		return
+	}
+	switch response.Action {
+	case "remove":
+		o.messages.Remove(response.Name)
 	}
 }
 
@@ -103,9 +127,12 @@ func (o *Hub) run() {
 				delete(o.observers, conn)
 			}
 		case message := <-o.chanBroadcast:
-			o.messages = append(o.messages, message)
-			log.Printf("got message: %v\n", string(message))
+			o.messages.Append(message)
+			log.Printf("got message from provider: %v\n", string(message))
 			o.notifyObservers(message)
+		case message := <-o.chanRecvObserver:
+			log.Printf("got message from observer: %v\n", string(message))
+			o.handleMessageFromObserver(message)
 		}
 	}
 }

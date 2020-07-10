@@ -27,25 +27,27 @@ type CurveStyle struct {
 	MarkerIsVoid    bool    `json:"markerIsVoid"`    // void marker (draw edge only)
 }
 
-// DefaultCurveStyle defines the default style
-var DefaultCurveStyle = CurveStyle{
-	// lines
-	LineColor: "#b33434",
-	LineAlpha: 0.7,
-	LineStyle: "-",
-	LineWidth: 3,
+// NewCurveStyle returns a new (default) curve style
+func NewCurveStyle() (o *CurveStyle) {
+	return &CurveStyle{
+		// lines
+		LineColor: "#b33434",
+		LineAlpha: 1.0,
+		LineStyle: "-",
+		LineWidth: 2,
 
-	// markers
-	MarkerType:      "o",
-	MarkerImg:       "",
-	MarkerColor:     "#4c4deb",
-	MarkerAlpha:     1,
-	MarkerSize:      0,
-	MarkerEvery:     0,
-	MarkerLineColor: "#ffffff",
-	MarkerLineWidth: 2,
-	MarkerLineStyle: "none",
-	MarkerIsVoid:    false,
+		// markers
+		MarkerType:      "o",
+		MarkerImg:       "",
+		MarkerColor:     "#4c4deb",
+		MarkerAlpha:     1.0,
+		MarkerSize:      0,
+		MarkerEvery:     0,
+		MarkerLineColor: "#ffffff",
+		MarkerLineWidth: 2,
+		MarkerLineStyle: "none",
+		MarkerIsVoid:    false,
+	}
 }
 
 // PythonParams returns curve style as python options

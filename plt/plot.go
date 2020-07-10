@@ -5,12 +5,12 @@
 package plt
 
 // Plot plots curve
-func Plot(x, y []float64, label string, style ...CurveStyle) {
-	var s CurveStyle
+func Plot(x, y []float64, label string, style ...*CurveStyle) {
+	var s *CurveStyle
 	if len(style) > 0 {
 		s = style[0]
 	} else {
-		s = DefaultCurveStyle
+		s = NewCurveStyle()
 	}
 	curve := &Curve{
 		Style:         s,
