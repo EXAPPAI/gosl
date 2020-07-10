@@ -22,13 +22,6 @@ type clientBrowser struct {
 	connection net.Conn
 }
 
-// action holds the data to be sent to the browser
-type response struct {
-	Name    string `json:"name"`
-	Action  string `json:"action"`
-	Payload string `json:"payload"`
-}
-
 // newClientBrowser creates new clientBrowser
 func newClientBrowser(name string, port string) (o *clientBrowser) {
 	dur, err := time.ParseDuration("1m")

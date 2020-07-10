@@ -11,9 +11,9 @@ import (
 
 // Response holds the data received from the Observer
 type Response struct {
-	Name    string `json:"name"`
-	Action  string `json:"action"`
-	Payload string `json:"payload"`
+	PlotName string `json:"plotName"`
+	Action   string `json:"action"`
+	Payload  string `json:"payload"`
 }
 
 // ParseResponse parses JSON response

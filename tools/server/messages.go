@@ -4,19 +4,15 @@
 
 package main
 
-import "log"
-
 // Messages holds all messages
 type Messages struct {
-	all      map[string][]byte // name => message
-	timeline []string          // names => order received
+	all map[string][][]byte // plotName => messages
 }
 
 // NewMessages returns a new Messages struct
 func NewMessages() (o *Messages) {
 	return &Messages{
-		all:      make(map[string][]byte),
-		timeline: []string{},
+		all: make(map[string][][]byte),
 	}
 }
 
@@ -26,34 +22,23 @@ func (o *Messages) Append(message []byte) {
 	if response == nil {
 		return
 	}
-	log.Printf("appending name = %v", response.Name)
-	o.all[response.Name] = message
-	o.timeline = append(o.timeline, response.Name)
+	if _, ok := o.all[response.PlotName]; ok {
+		o.all[response.PlotName] = append(o.all[response.PlotName], message)
+	} else {
+		o.all[response.PlotName] = [][]byte{message}
+	}
 }
 
 // Remove removes message
-func (o *Messages) Remove(name string) {
-	log.Printf(">>> timeline = %v", o.timeline)
-
-	if _, ok := o.all[name]; ok {
-		delete(o.all, name)
-		temp := []string{}
-		for _, n := range o.timeline {
-			if n != name {
-				temp = append(temp, n)
-			}
-		}
-		o.timeline = temp
-	}
-
-	log.Printf("timeline = %v", o.timeline)
+func (o *Messages) Remove(plotName string) {
+	delete(o.all, plotName)
 }
 
 // SendAll sends all messages using dispatcher function
 func (o *Messages) SendAll(dispatcher func(message []byte)) {
-	for _, name := range o.timeline {
-		if _, ok := o.all[name]; ok {
-			dispatcher(o.all[name])
+	for _, messages := range o.all {
+		for _, message := range messages {
+			dispatcher(message)
 		}
 	}
 }

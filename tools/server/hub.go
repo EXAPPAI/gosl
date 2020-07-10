@@ -111,7 +111,7 @@ func (o *Hub) handleMessageFromObserver(message []byte) {
 	}
 	switch response.Action {
 	case "remove":
-		o.messages.Remove(response.Name)
+		o.messages.Remove(response.PlotName)
 	}
 }
 
@@ -128,10 +128,8 @@ func (o *Hub) run() {
 			}
 		case message := <-o.chanBroadcast:
 			o.messages.Append(message)
-			log.Printf("got message from provider: %v\n", string(message))
 			o.notifyObservers(message)
 		case message := <-o.chanRecvObserver:
-			log.Printf("got message from observer: %v\n", string(message))
 			o.handleMessageFromObserver(message)
 		}
 	}
