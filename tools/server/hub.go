@@ -112,6 +112,9 @@ func (o *Hub) handleMessageFromObserver(message []byte) {
 	switch response.Action {
 	case "remove":
 		o.messages.Remove(response.PlotName)
+		o.messages.SendAll(func(msg []byte) {
+			o.notifyObservers(msg)
+		})
 	}
 }
 
