@@ -22,6 +22,7 @@ type Hub struct {
 	observers      map[net.Conn]bool
 	chanRemoveConn chan net.Conn
 	chanBroadcast  chan []byte
+	messages       [][]byte
 }
 
 // NewHub creates a new Hub
@@ -31,6 +32,7 @@ func NewHub() *Hub {
 		make(map[net.Conn]bool),
 		make(chan net.Conn),
 		make(chan []byte),
+		[][]byte{},
 	}
 	go o.run()
 	return o
@@ -70,6 +72,23 @@ func (o *Hub) AddObserver(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("### added observer ###")
 	o.observers[conn] = true
+	if len(o.messages) > 0 {
+		for _, message := range o.messages {
+			o.notifyObservers(message)
+		}
+	}
+}
+
+// notifyObservers notifies all observers
+func (o *Hub) notifyObservers(message []byte) {
+	for conn := range o.observers {
+		err := wsutil.WriteServerMessage(conn, ws.OpText, message)
+		if err != nil {
+			log.Printf("!!! error while writing message !!!")
+			conn.Close()
+			delete(o.observers, conn)
+		}
+	}
 }
 
 // run runs the hub
@@ -84,15 +103,9 @@ func (o *Hub) run() {
 				delete(o.observers, conn)
 			}
 		case message := <-o.chanBroadcast:
+			o.messages = append(o.messages, message)
 			log.Printf("got message: %v\n", string(message))
-			for conn := range o.observers {
-				err := wsutil.WriteServerMessage(conn, ws.OpText, message)
-				if err != nil {
-					log.Printf("!!! error while writing message !!!")
-					conn.Close()
-					delete(o.observers, conn)
-				}
-			}
+			o.notifyObservers(message)
 		}
 	}
 }
