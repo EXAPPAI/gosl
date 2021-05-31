@@ -265,3 +265,44 @@ func (o *Communicator) RecvOneI(fromID int) (val int) {
 	C.MPI_Recv(buf, 1, C.TyLong, C.int(fromID), 10004, o.comm, C.StIgnore)
 	return vals[0]
 }
+
+// credits goes to zeyu (thomas) liu
+// send a uint64 array
+func (o *Communicator) SendU(vals []uint64, toID int) {
+	buf := unsafe.Pointer(&vals[0])
+	C.MPI_Send(buf, C.int(len(vals)), C.MPI_UNSIGNED_LONG, C.int(toID), 10006, o.comm)
+}
+
+// recv a uint64 array
+func (o *Communicator) RecvU(vals []uint64, fromID int) {
+	buf := unsafe.Pointer(&vals[0])
+	C.MPI_Recv(buf, C.int(len(vals)), C.MPI_UNSIGNED_LONG, C.int(fromID), 10006, o.comm, C.StIgnore)
+}
+
+// BcastFromRoot broadcasts slice from root (Rank == 0) to all other processors, for unsigned integers
+func (o *Communicator) BcastFromRootU(x []uint64) {
+	buf := unsafe.Pointer(&x[0])
+	C.MPI_Bcast(buf, C.int(len(x)), C.MPI_UNSIGNED_LONG, 0, o.comm)
+}
+
+// ReduceSum sums all values in 'orig' to 'dest' in root (Rank == 0) processor, for unsigned integers
+//   NOTE (important): orig and dest must be different slices
+func (o *Communicator) ReduceSumU(dest, orig []uint64) {
+	sendbuf := unsafe.Pointer(&orig[0])
+	recvbuf := unsafe.Pointer(&dest[0])
+	if uintptr(sendbuf) == uintptr(recvbuf) {
+		panic("ReduceSumU sendbuf and recvbuf must be different")
+	}
+	C.MPI_Reduce(sendbuf, recvbuf, C.int(len(dest)), C.MPI_UNSIGNED_LONG, C.OpSum, 0, o.comm)
+}
+
+// AllReduceSum combines all values from orig into dest summing values, for unsigned integers
+//   NOTE (important): orig and dest must be different slices
+func (o *Communicator) AllReduceSumU(dest, orig []uint64) {
+	sendbuf := unsafe.Pointer(&orig[0])
+	recvbuf := unsafe.Pointer(&dest[0])
+	if uintptr(sendbuf) == uintptr(recvbuf) {
+		panic("AllReduceSumU sendbuf and recvbuf must be different")
+	}
+	C.MPI_Allreduce(sendbuf, recvbuf, C.int(len(dest)), C.MPI_UNSIGNED_LONG, C.OpSum, o.comm)
+}
