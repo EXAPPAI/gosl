@@ -136,6 +136,13 @@ func (o *Communicator) BcastFromRootC(x []complex128) {
 	C.MPI_Bcast(buf, C.int(len(x)), C.TyComplex, 0, o.comm)
 }
 
+
+// BcastFromRootU broadcasts slice from root (Rank == 0) to all other processors (uint64 version)
+func (o *Communicator) BcastFromRootU(x []uint64) {
+	buf := unsafe.Pointer(&x[0])
+	C.MPI_Bcast(buf, C.int(len(x)), C.TyComplex, 0, o.comm)
+}
+
 // ReduceSum sums all values in 'orig' to 'dest' in root (Rank == 0) processor
 //   NOTE (important): orig and dest must be different slices
 func (o *Communicator) ReduceSum(dest, orig []float64) {
