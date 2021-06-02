@@ -285,6 +285,12 @@ func (o *Communicator) BcastFromRootU(x []uint64) {
 	C.MPI_Bcast(buf, C.int(len(x)), C.MPI_UNSIGNED_LONG, 0, o.comm)
 }
 
+// BcastFromRoot broadcasts slice from root (Rank == 0) to all other processors, for integers
+func (o *Communicator) BcastFromRootI(x []int) {
+	buf := unsafe.Pointer(&x[0])
+	C.MPI_Bcast(buf, C.int(len(x)), C.MPI_INT, 0, o.comm)
+}
+
 // ReduceSum sums all values in 'orig' to 'dest' in root (Rank == 0) processor, for unsigned integers
 //   NOTE (important): orig and dest must be different slices
 func (o *Communicator) ReduceSumU(dest, orig []uint64) {
